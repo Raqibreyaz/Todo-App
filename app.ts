@@ -1,14 +1,20 @@
 import Fastify from "fastify";
 
-const server = Fastify({ logger: true });
+const app = Fastify({ logger: true });
 
-server.get("/", (_request, _reply) => {
-  return "HELLO";
+app.get("/", (_request, _reply) => {
+  return {
+    name: "Task API",
+    version: "1.0",
+    endpoints: ["/tasks"],
+  };
 });
 
+app.get("/health", () => ({ status: "OK" }));
+
 try {
-  await server.listen({ port: 3000 });
+  await app.listen({ port: 3000 });
 } catch (error) {
-  server.log.error("Server failed to start.");
+  app.log.error("Server failed to start.");
   process.exit(1);
 }
