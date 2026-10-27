@@ -2,6 +2,7 @@ import Fastify from "fastify";
 
 const app = Fastify({ logger: false });
 
+let nextId = 4;
 const tasks = [
   { id: 1, title: "Complete Assignment 1", done: false },
   { id: 2, title: "Complete Assignment 2", done: false },
@@ -27,10 +28,22 @@ app.get<{ Params: { id: string } }>("/tasks/:id", (request, reply) => {
   const task = tasks.find((task) => task.id === taskId);
 
   if (!task) {
-    reply.code(404).send({ error: `Task ${id} not found.` });
+    return reply.code(404).send({ error: `Task ${id} not found.` });
   }
 
   return task;
+});
+
+app.post<{ Body: { title: string } }>("/tasks", (request, reply) => {
+  const { title } = request.body;
+
+  if (!title) {
+    return reply.code(400).send({ error: "Title is required." });
+  }
+
+  tasks.push({ id: nextId++, done: false, title });
+
+  return reply.code(201).send(tasks[tasks.length - 1]);  
 });
 
 try {
