@@ -13,6 +13,16 @@ A CRUD API that lets you create, read, update, and delete todo tasks. Tasks are 
 - Full CRUD on `/tasks`
 - Interactive Swagger UI at `/docs`
 
+> [!WARNING]
+> **Data does not persist across restarts.** Tasks live in RAM, so every time the server restarts it resets to the three built-in seed tasks below. Any tasks you created during the previous session will be gone.
+>
+> Default seed tasks on every fresh start:
+> | id | title | done |
+> |----|-------|------|
+> | 1 | Complete Assignment 1 | false |
+> | 2 | Complete Assignment 2 | false |
+> | 3 | Complete Assignment 3 | false |
+
 ---
 
 ## Requirements

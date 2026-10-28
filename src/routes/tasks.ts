@@ -11,24 +11,71 @@ interface UpdateBody {
   done?: boolean;
 }
 
+interface FilterQueryParams {
+  search?: string;
+  done?: boolean;
+}
+
 interface IdParam {
   id: string;
 }
 
 let nextId = 4;
-const tasks: Task[] = [
+const dummyTasks = [
   { id: 1, title: "Complete Assignment 1", done: false },
   { id: 2, title: "Complete Assignment 2", done: false },
   { id: 3, title: "Complete Assignment 3", done: false },
 ];
 
+const tasks: Task[] = JSON.parse(JSON.stringify(dummyTasks));
+
 const taskRoutes: FastifyPluginAsync = async (app) => {
   app.get(
+    "/stats",
+    {
+      schema: {
+        tags: ["Todos"],
+        summary: "Stats of Todos",
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              total: { type: "integer" },
+              done: { type: "integer" },
+              open: { type: "integer" },
+            },
+            required: ["total", "done", "open"],
+          },
+        },
+      },
+    },
+    (_request, reply) => {
+      const doneCount = tasks.reduce(
+        (prev, task) => prev + (task.done ? 1 : 0),
+        0,
+      );
+
+      return reply.send({
+        total: tasks.length,
+        done: doneCount,
+        open: tasks.length - doneCount,
+      });
+    },
+  );
+
+  app.get<{ Querystring: FilterQueryParams }>(
     "/",
     {
       schema: {
         tags: ["Todos"],
         summary: "Get all Todos",
+        querystring: {
+          type: "object",
+          properties: {
+            search: { type: "string" },
+            done: { type: "boolean" },
+          },
+        },
         response: {
           200: {
             type: "array",
@@ -45,7 +92,21 @@ const taskRoutes: FastifyPluginAsync = async (app) => {
         },
       },
     },
-    () => tasks,
+    (request, reply) => {
+      const { search, done } = request.query;
+
+      if (!search && !done) {
+        return reply.send(tasks);
+      }
+
+      const filteredTasks = tasks.filter((task) => {
+        if (search && !task.title.includes(search)) return false;
+        if (done && task.done !== done) return false;
+        return true;
+      });
+
+      return reply.send(filteredTasks);
+    },
   );
 
   app.get<{ Params: IdParam }>(
@@ -209,6 +270,35 @@ const taskRoutes: FastifyPluginAsync = async (app) => {
       tasks.splice(taskIndex, 1);
 
       return reply.code(204).send();
+    },
+  );
+
+  app.post(
+    "/reset",
+    {
+      schema: {
+        tags: ["Todos"],
+        summary: "Reset with default Todos",
+        response: {
+          201: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "integer" },
+                title: { type: "string" },
+                done: { type: "boolean" },
+              },
+              required: ["id", "title", "done"],
+            },
+          },
+        },
+      },
+    },
+    (_request, reply) => {
+      tasks.splice(0, tasks.length, ...JSON.parse(JSON.stringify(dummyTasks)));
+
+      return reply.send(tasks);
     },
   );
 };

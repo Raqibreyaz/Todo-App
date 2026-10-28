@@ -1,7 +1,7 @@
 import Fastify from "fastify";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
-import taskRoutes from "./src/routes/tasks.js";
+import taskRoutes from "./routes/tasks.js";
 
 const app = Fastify({ logger: false });
 
@@ -19,13 +19,11 @@ await app.register(swaggerUI, { routePrefix: "/docs" });
 
 await app.register(taskRoutes, { prefix: "/tasks" });
 
-app.get("/", () => {
-  return {
-    name: "Task API",
-    version: "1.0",
-    endpoints: ["/tasks"],
-  };
-});
+app.get("/", () => ({
+  name: "Task API",
+  version: "1.0",
+  endpoints: ["/tasks"],
+}));
 
 app.get("/health", () => ({ status: "OK" }));
 

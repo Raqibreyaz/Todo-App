@@ -1,0 +1,1 @@
+1. the non-string values in the body/query may come as string in request, so parsing to correct data type is essential, using the schema handles this automatically
