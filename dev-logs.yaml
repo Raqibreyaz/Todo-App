@@ -1,1 +1,46 @@
 1. the non-string values in the body/query may come as string in request, so parsing to correct data type is essential, using the schema handles this automatically
+
+- use the ai-version directory
+- do not read the src directory to see my code, write your own code
+- all dependencies are already installed
+- use typescript
+- create a todo app in fastify
+- use in-memory data structure for the todo storage
+- todo => {id: number, title: string, done: boolean}
+- it should support operations like getting all todos, getting a single todo, adding a new todo, updating a todo, deleting a todo
+- '/' endpoint should return a json showing api version, endpoints list, name of the server api
+- /health should return a 200 "OK"
+- initially there will be 3 pre existing todos
+- POST /tasks/reset should reset all the todos with the initial 3
+- deleting the todo just delete it but return no content, if todo doesn't exist then 404
+- updating the todo can update any value provided in the body, if nothing to update then return 'bad request' response, PUT method will be here
+- get a todo will just fetch and return that todo if not found return 404
+- creating todo just takes a required 'title' and creates it with done: false
+- getting all todos returns all the todos, it also filters the tasks according to query params,  searches tasks title containing 'search' string, searches tasks having done 'done'
+- /tasks/stats returns json showing total, done, open no of tasks
+- give proper schema to each route for request validation and response structure, tagging each route into their respective groups
+- use swagger and swagger UI for interactive api testing in browser at /docs
+- start the server at port 3000
+
+
+AI vs ME:
+
+What did the AI do better — and do you understand its version well enough to explain it?
+- created separate types.ts file for all the types making them centralised at one place increasing modularity and reusability
+- for each route a separate request validation and response structure readonly schemas is created in a separate file to reduce main code verbosity
+- broken the route registration and server starting code into different functions
+- for task CRUD operations and others also, created a whole class where tasks is private and methods are used to perform operations and accessing it
+- '/' endpoint is returning all the available endpoints with http methods the server offers, in my version i just had added the /tasks without http method as the single endpoint
+- for health check, it is conditionally returning json or plain text based on what client accepts while in mine i just returned the plain text response
+- i was relying on the schema to give the parsed data, while AI additionally handles the boolean parsing logic apart from schema
+- explicit checks have done for undefined when data is coming from client
+- performed case insensitive search where in mine i just did without it
+- yes i can explain the AI version except the configurations it used for swager and fastify
+
+
+What did it get wrong or quietly ignore from your prompt? (A missing 400 ? A wrong status code? A database you never asked for?)
+- it didnt do anything wrong, but it did many things which i dont do to code like adding main file checks before direct execution
+
+What did your prompt forget to specify — and what did the AI silently decide for you?
+- handled the case of 'not starting the server' when the file is imported at somewhere else and the created server app is just exported, while i didnt forget it, actually i never do this in my code
+- used many options/properties which i don't even know for configuring the app(routerOptions, ajv), registering swagger(servers, tags) and swagger ui(uiConfig, statiCSP, transformStaticCSP)
